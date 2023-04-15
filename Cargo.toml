@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "scow-engine",
+    "scow-cli",
+]
