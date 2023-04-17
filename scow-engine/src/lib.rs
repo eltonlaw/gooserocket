@@ -1,14 +1,7 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use scow_infra::aws::cloudformation;
+use tokio::runtime::Runtime;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn deploy_jupyter_notebook() {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(cloudformation::create_stack());
 }
