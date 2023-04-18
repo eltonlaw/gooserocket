@@ -1,0 +1,13 @@
+Resources:
+  EC2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c94855ba95c71c99
+      KeyName: scow-dev-instances-1
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          SubnetId: subnet-991015fe
+          GroupSet:
+            - sg-0ce19ae8f275b3a2b
