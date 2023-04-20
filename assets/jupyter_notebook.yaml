@@ -4,7 +4,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-0c94855ba95c71c99
-      KeyName: scow-dev-instances-1
+      KeyName: gr-dev-instances-1
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: true

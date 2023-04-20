@@ -1,12 +1,12 @@
-# spherical cow
+# gooserocket
 
-spherical-cow is a computational bioinformatics research platform for running experiments on AWS.
+gooserocket is a computational bioinformatics research platform for running experiments on AWS.
 
 ## Design goals
 
 These are not set in stone:
 
-1. Keeping costs low: AWS spot instances will be used, so things will be built such that they are interruption tolerant. Things will be cleaned up as soon as they're finished. Data will mostly be stored in S3.
+1. Keeping costs low: AWS spot instances will be used, so things will be built such that they are interruption tolerant. Things will be cleaned up as soon as they're finished. Data and state will mostly be stored in S3.
     1. TODO: see if S3 IA can fit with spot instances
     2. TODO: Good way to infer optimal instance size? Could use historical data, would need to save that metadata
 2. Generic primitives: A rust function, which does something to some input and outputs something, run on some image, will serve as the main compute abstraction.
@@ -21,29 +21,30 @@ These are not set in stone:
 
 ## To Do
 
-- scow-data: Lib code for getting & managing heterogeneous data
+- gr-data: Lib code for getting & managing heterogeneous data
     * [ ] API call to get amino acid sequence from uniprot given id, ex. P0DTC2
     * [ ] API call to get protein structure from pdb given the pdb id, ex. 6VXX
     * [ ] Restructure and index alphafold data
     * [ ] Investigate better compression/decompression for use cases
     * [ ] Export to .pdb
     * [ ] Export to .fasta
-- scow-bio: Algorithms
+- gr-bio: Algorithms
     * [ ] AutoDock Vina scoring
     * [ ] Poisson-Boltzmann model
-- scow-engine: Launches experiments
+- gr-engine: Launches experiments
     * [ ] Launch a jupyter notebook with required deps
     * [ ] Package some entrypoint into a spot instance fleet and schedule
-- scow-infra:
+- gr-infra:
     * [ ] Parallelized s3:GetObject from s3
     * [ ] Parallelized s3:PutObject to s3
     * [ ] create cloudformation stack
     * [ ] update cloudformation stack
-- scow-cli: CLI for interacting with resources
-    * [ ] `./scow-cli deploy <target>`
-    * [ ] `./scow-cli infra datasources ls`
-    * [ ] `./scow-cli experiments ls`
-    * [ ] `./scow-cli jobs ls`
-    * [ ] `./scow-cli system prune`
-- scow-tracing: utils for tracing
+- gr-cli: CLI for interacting with resources
+    * [ ] `./gr-cli deploy <target>`
+    * [ ] `./gr-cli infra datasources ls`
+    * [ ] `./gr-cli experiments ls`
+    * [ ] `./gr-cli jobs ls`
+    * [ ] `./gr-cli system prune`
+    * [ ] `./gr-cli shutdown all`
+- gr-tracing: utils for tracing
     * [ ] export to honeycomb.io for initial experiments monitoring

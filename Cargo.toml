@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "scow-infra",
-    "scow-engine",
-    "scow-cli",
+    "gr-infra",
+    "gr-engine",
+    "gr-cli",
 ]

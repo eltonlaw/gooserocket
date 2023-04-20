@@ -1,5 +1,5 @@
 use clap::{command, Command};
-use scow_engine;
+use gr_engine;
 
 fn main() {
     let matches = command!()
@@ -12,7 +12,7 @@ fn main() {
         )
         .get_matches();
     match matches.subcommand() {
-        Some(("deploy-jupyter-notebook", _sub_matches)) => scow_engine::deploy_jupyter_notebook(),
+        Some(("deploy-jupyter-notebook", _sub_matches)) => gr_engine::deploy_jupyter_notebook(),
         _ => unreachable!("Exhaused list of subcommands"),
     }
 }
