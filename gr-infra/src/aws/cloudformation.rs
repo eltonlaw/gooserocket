@@ -5,17 +5,27 @@ use std::path::PathBuf;
 use aws_config;
 use aws_sdk_cloudformation as cf;
 
-pub async fn is_stack_existing(stack_name: &String) -> bool  {
+pub async fn new_client() -> cf::Client {
     let config = aws_config::from_env().load().await;
-    let client = cf::Client::new(&config);
+    cf::Client::new(&config)
+}
+
+pub async fn is_stack_existing(stack_name: &String) -> bool  {
+    let client = new_client().await;
 
     match client
         .describe_stacks()
         .stack_name(stack_name)
         .send()
         .await {
-        Ok(res) => true,
-        Err(_) => false
+        Ok(res) => {
+            println!("Got stacks: {:?}", res);
+            true
+        },
+        Err(_) => {
+            println!("Couldn't find stack");
+            false
+        }
     }
 }
 
@@ -25,8 +35,7 @@ pub async fn create_stack(stack_name: String, stack_fp: String)
     stack_abs_fp.push(stack_fp.as_str());
     let template_body = fs::read_to_string(&stack_abs_fp)?;
 
-    let config = aws_config::from_env().load().await;
-    let client = cf::Client::new(&config);
+    let client = new_client().await;
 
     if !is_stack_existing(&stack_name).await {
         println!("Creating new stack {} from fp {:?} with body\n{}", stack_name, stack_abs_fp, template_body);
