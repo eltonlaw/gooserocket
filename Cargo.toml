@@ -1,7 +1,8 @@
 [workspace]
 
 members = [
-    "gr-infra",
-    "gr-engine",
+    "gr-bio",
     "gr-cli",
+    "gr-engine",
+    "gr-infra",
 ]
