@@ -1,11 +1,14 @@
+use std::path::PathBuf;
 use gr_infra::aws::cloudformation;
 use tokio::runtime::Runtime;
 
 pub fn deploy_jupyter_notebook() {
     let rt = Runtime::new().unwrap();
+    let stack_fp = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../assets/jupyter_notebook.yaml");
     let result = rt.block_on(cloudformation::create_or_update_stack(
             "gr-jupyter-nb-1",
-            "../assets/jupyter_notebook.yaml",
+            &stack_fp,
         ));
 
     match result {
