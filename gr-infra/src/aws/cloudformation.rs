@@ -10,7 +10,7 @@ pub async fn new_client() -> cf::Client {
     cf::Client::new(&config)
 }
 
-pub async fn is_stack_existing(stack_name: &String) -> bool  {
+pub async fn is_stack_existing(stack_name: &str) -> bool  {
     let client = new_client().await;
 
     match client
@@ -29,15 +29,15 @@ pub async fn is_stack_existing(stack_name: &String) -> bool  {
     }
 }
 
-pub async fn create_stack(stack_name: String, stack_fp: String)
+pub async fn create_stack(stack_name: &str, stack_fp: &str)
     -> Result<(), Box<dyn error::Error>> {
     let mut stack_abs_fp = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    stack_abs_fp.push(stack_fp.as_str());
+    stack_abs_fp.push(stack_fp);
     let template_body = fs::read_to_string(&stack_abs_fp)?;
 
     let client = new_client().await;
 
-    if !is_stack_existing(&stack_name).await {
+    if !is_stack_existing(stack_name).await {
         println!("Creating new stack {} from fp {:?} with body\n{}", stack_name, stack_abs_fp, template_body);
         client
             .create_stack()

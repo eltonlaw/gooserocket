@@ -4,8 +4,8 @@ use tokio::runtime::Runtime;
 pub fn deploy_jupyter_notebook() {
     let rt = Runtime::new().unwrap();
     let result = rt.block_on(cloudformation::create_stack(
-            String::from("gr-jupyter-nb-1"),
-            String::from("../assets/jupyter_notebook.yaml"),
+            "gr-jupyter-nb-1",
+            "../assets/jupyter_notebook.yaml",
         ));
 
     match result {
