@@ -16,3 +16,12 @@ pub fn deploy_jupyter_notebook() {
         Err(error) => eprintln!("Error: {:?}", error),
     }
 }
+
+pub fn shutdown() {
+    let rt = Runtime::new().unwrap();
+    let result = rt.block_on(cloudformation::delete_stack("gr-jupyter-nb-1"));
+    match result {
+        Ok(_) => println!("Tore down jupyter notebook"),
+        Err(error) => eprintln!("Error: {:?}", error),
+    }
+}

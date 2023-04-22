@@ -37,7 +37,6 @@ pub async fn create_stack(stack_name: &str, stack_fp: &PathBuf)
         .template_body(template_body)
         .send()
         .await?;
-
     Ok(())
 }
 
@@ -51,7 +50,17 @@ pub async fn update_stack(stack_name: &str, stack_fp: &PathBuf)
         .template_body(template_body)
         .send()
         .await?;
+    Ok(())
+}
 
+pub async fn delete_stack(stack_name: &str)
+    -> Result<(), Box<dyn error::Error>> {
+    let client = new_client().await;
+    client
+        .delete_stack()
+        .stack_name(stack_name)
+        .send()
+        .await?;
     Ok(())
 }
 
