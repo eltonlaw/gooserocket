@@ -37,17 +37,43 @@ pub async fn create_stack(stack_name: &str, stack_fp: &str)
 
     let client = new_client().await;
 
-    if !is_stack_existing(stack_name).await {
-        println!("Creating new stack {} from fp {:?} with body\n{}", stack_name, stack_abs_fp, template_body);
-        client
-            .create_stack()
-            .stack_name(stack_name)
-            .template_body(template_body)
-            .send()
-            .await?;
-    } else {
-        println!("Stack already exists. Skipping stack creation");
-    }
+    client
+        .create_stack()
+        .stack_name(stack_name)
+        .template_body(template_body)
+        .send()
+        .await?;
 
+    Ok(())
+}
+
+pub async fn update_stack(stack_name: &str, stack_fp: &str)
+    -> Result<(), Box<dyn error::Error>> {
+
+    let mut stack_abs_fp = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    stack_abs_fp.push(stack_fp);
+    let template_body = fs::read_to_string(&stack_abs_fp)?;
+
+    let client = new_client().await;
+    client
+        .update_stack()
+        .stack_name(stack_name)
+        .template_body(template_body)
+        .send()
+        .await?;
+
+    Ok(())
+}
+
+pub async fn create_or_update_stack(stack_name: &str, stack_fp: &str)
+    -> Result<(), Box<dyn error::Error>> {
+
+    if !is_stack_existing(stack_name).await {
+        println!("Creating new stack {} from fp {} with body", stack_name, stack_fp);
+        create_stack(stack_name, stack_fp).await?;
+    } else {
+        println!("Stack {} already exists. Running update_stack instead with {}", stack_name, stack_fp);
+        update_stack(stack_name, stack_fp).await?;
+    }
     Ok(())
 }
