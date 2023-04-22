@@ -48,3 +48,11 @@ These are not set in stone:
     * [ ] `./gr-cli shutdown all`
 - gr-tracing: utils for tracing
     * [ ] export to honeycomb.io for initial experiments monitoring
+
+## Setup
+
+Not all required AWS resources are in CF such that you can deploy the entire platform cold
+
+- security group
+- ssh key-pair
+- create billing reports sent to bucket
