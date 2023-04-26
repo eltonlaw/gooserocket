@@ -1,0 +1,12 @@
+Parameters:
+  RawDataBucketName:
+    Type: String
+    Description: Bucket for raw public data
+    Default: gr-raw-data
+
+Resources:
+  RawDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref RawDataBucketName
+      AccessControl: Private

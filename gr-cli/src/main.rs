@@ -1,4 +1,4 @@
-use clap::{command, Command};
+use clap::{Arg, ArgAction, command, Command};
 use gr_engine;
 
 fn main() {
@@ -7,8 +7,12 @@ fn main() {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
-            Command::new("deploy-jupyter-notebook")
-                .about("Creates a new ec2 instance with jupyter notebook running and deployed at port 8080")
+            Command::new("deploy")
+                .about("Deploy a new service")
+                .arg(Arg::new("target")
+                     .help("deploy target")
+                     .action(ArgAction::Set)
+                     .required(true))
         )
         .subcommand(
             Command::new("shutdown")
@@ -16,7 +20,11 @@ fn main() {
         )
         .get_matches();
     match matches.subcommand() {
-        Some(("deploy-jupyter-notebook", _sub_matches)) => gr_engine::deploy_jupyter_notebook(),
+        Some(("deploy", submatches)) => match submatches.get_one::<String>("target").unwrap().as_str() {
+            "jupyter-notebook" => gr_engine::deploy_jupyter_notebook(),
+            "common-infra" => gr_engine::deploy_common_infra(),
+            _ => unreachable!("Exhausted list of deploy subcommands"),
+        },
         Some(("shutdown", _sub_matches)) => gr_engine::shutdown(),
         _ => unreachable!("Exhaused list of subcommands"),
     }
