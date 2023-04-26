@@ -6,10 +6,11 @@ gooserocket is a computational bioinformatics research platform for running expe
 
 These are not set in stone:
 
-1. Keeping costs low: AWS spot instances will be used, so things will be built such that they are interruption tolerant. Things will be cleaned up as soon as they're finished. Data and state will mostly be stored in S3.
-    1. TODO: see if S3 IA can fit with spot instances
-    2. TODO: Good way to infer optimal instance size? Could use historical data, would need to save that metadata 2. Generic primitives: A rust function, which does something to some input and outputs something, run on some image, will serve as the main compute abstraction.
-3. User interface will be half CLI, half Jupyter notebook: Infra and experiments managed by CLI, if need to dig into results, jupyter notebook can call those same tools. Jupyter notebook will also be used to process, visualize and analyze experimental results.
+1. Keeping costs low: AWS spot instances will be used, so things will be built such that they are interruption tolerant.
+    1. No idle resources. Only select things in S3 will be persisted.
+    2. All jobs run through spot instances, compute set up to be idempotent and interruptible.
+    3. Minimize egress from S3/ECR, keep everything in same region, HA is unneccessary. At \$0.09/GB, grabbing terabyte level data from S3 gets super expensive 
+2. User interface will be half CLI, half Jupyter notebook: Infra and experiments managed by CLI, if need to dig into results, jupyter notebook can call those same tools. Jupyter notebook will also be used to process, visualize and analyze experimental results.
 
 ## Aspirations
 
