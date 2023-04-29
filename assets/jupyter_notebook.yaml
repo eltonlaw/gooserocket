@@ -3,7 +3,8 @@ Resources:
     Type: "AWS::EC2::Instance"
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-0c94855ba95c71c99
+      # ubuntu 22.04
+      ImageId: ami-007855ac798b5175e
       KeyName: gr-dev-instances-1
       NetworkInterfaces:
         - DeviceIndex: 0
@@ -11,3 +12,19 @@ Resources:
           SubnetId: subnet-991015fe
           GroupSet:
             - sg-0ce19ae8f275b3a2b
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt update -y
+          ## Requires reboot because linux kernel updates as well
+          # apt upgrade -y
+          apt install awscli python3-pip -y
+          pip3 install jupyter
+          jupyter notebook --generate-config --allow-root
+          nohup jupyter notebook --ip=0.0.0.0 --port 8888 </dev/null >/dev/null 2>&1 &
+          ## FIXME: creds don't exist yet
+          # INSTANCE_ID=`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`
+          # aws ec2 create-tags --resources $INSTANCE_ID --tags Key=App,Value="jupyter-notebook" --region us-east-1
+      Tags:
+        - Key: Project
+          Value: gooserocket
