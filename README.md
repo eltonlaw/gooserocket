@@ -15,15 +15,18 @@ These are not set in stone:
 ## Aspirations
 
 - [ ] Fn to spin up an ec2 instance that uses alphafold to predict protein structure given amino acid sequence.
+- [ ] Compare protein sequence to other protein sequences (FASTA / PSI-BLAST for biologically significant match)
 - [ ] Read in compounds from PubChem and run AutoDock Vina on them with some target protein in a distributed fashion
 - [ ] Run similarity analysis using rxrx3
-- [ ] Build up a database of generic data.
+- [ ] Build up database of subset of public data with focus on DNA/Protein sequences, macromolecule structures and the results of genomics experiments
+
 
 ## To Do
 
 - gr-data: Lib code for getting & managing heterogeneous data
     * [ ] API call to get amino acid sequence from uniprot given id, ex. P0DTC2
     * [ ] API call to get protein structure from pdb given the pdb id, ex. 6VXX
+    * [ ] Accessing genbank's nucleic acid sequences
     * [ ] Restructure and index alphafold data
     * [ ] Investigate better compression/decompression for use cases
     * [ ] Export to .pdb
