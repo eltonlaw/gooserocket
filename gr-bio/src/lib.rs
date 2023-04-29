@@ -1,3 +1,5 @@
+use once_cell::sync::Lazy;
+
 pub struct AminoAcid {
     pub codon: Vec<&'static str>,
     pub name: &'static str,
@@ -5,8 +7,8 @@ pub struct AminoAcid {
     pub code3: &'static str,
 }
 
-pub fn amino_acids() -> Vec<AminoAcid> {
-    return vec![
+static AMINO_ACIDS: Lazy<Vec<AminoAcid>> = Lazy::new(|| {
+    vec![
         AminoAcid {
             codon: vec!["GCU", "GCC", "GCA", "GCG"],
             name: "Alanine",
@@ -113,8 +115,7 @@ pub fn amino_acids() -> Vec<AminoAcid> {
             codon: vec!["UGG"],
             name: "Tryptophan",
             code1: 'W',
-            code3: "Trp",
-        },
+            code3: "Trp", },
         AminoAcid {
             codon: vec!["UAU", "UAC"],
             name: "Tyrosine",
@@ -127,12 +128,8 @@ pub fn amino_acids() -> Vec<AminoAcid> {
             code1: 'V',
             code3: "Val",
         },
-    ];
-}
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+    ]
+});
 
 #[cfg(test)]
 mod tests {
@@ -140,7 +137,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+        let aa = AMINO_ACIDS.first().unwrap();
+        assert_eq!('A', aa.code1);
     }
 }
