@@ -31,12 +31,13 @@ pub async fn create_stack(stack_name: &str, stack_fp: &PathBuf)
     -> Result<(), Box<dyn error::Error>> {
     let template_body = fs::read_to_string(stack_fp)?;
     let client = new_client().await;
-    client
+    let res = client
         .create_stack()
         .stack_name(stack_name)
         .template_body(template_body)
         .send()
         .await?;
+    println!("create_stack res: {:?}", res);
     Ok(())
 }
 
@@ -44,23 +45,25 @@ pub async fn update_stack(stack_name: &str, stack_fp: &PathBuf)
     -> Result<(), Box<dyn error::Error>> {
     let template_body = fs::read_to_string(stack_fp)?;
     let client = new_client().await;
-    client
+    let res = client
         .update_stack()
         .stack_name(stack_name)
         .template_body(template_body)
         .send()
         .await?;
+    println!("update_stack res: {:?}", res);
     Ok(())
 }
 
 pub async fn delete_stack(stack_name: &str)
     -> Result<(), Box<dyn error::Error>> {
     let client = new_client().await;
-    client
+    let res = client
         .delete_stack()
         .stack_name(stack_name)
         .send()
         .await?;
+    println!("delete_stack res: {:?}", res);
     Ok(())
 }
 
