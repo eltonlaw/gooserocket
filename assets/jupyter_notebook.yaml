@@ -1,17 +1,25 @@
+Parameters:
+  JupyterNotebookInstanceType:
+    Type: String
+    Description: Instance type to deploy jupyter notebook with
+    Default: t2.micro
+
 Resources:
-  EC2Instance:
-    Type: "AWS::EC2::Instance"
+  JupyterNotebook:
+    Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro
-      # ubuntu 22.04
-      ImageId: ami-007855ac798b5175e
-      KeyName: gr-dev-instances-1
+      InstanceType: !Ref JupyterNotebookInstanceType
+      ImageId:
+        Fn::ImportValue: BaseImageId
+      KeyName:
+        Fn::ImportValue: DevKeyName
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: true
-          SubnetId: subnet-991015fe
+          SubnetId:
+            Fn::ImportValue: PublicSubnetId1
           GroupSet:
-            - sg-0ce19ae8f275b3a2b
+            - Fn::ImportValue: DevSecurityGroup
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -21,10 +29,22 @@ Resources:
           apt install awscli python3-pip -y
           pip3 install jupyter
           jupyter notebook --generate-config --allow-root
-          nohup jupyter notebook --ip=0.0.0.0 --port 8888 </dev/null >/dev/null 2>&1 &
+          nohup jupyter notebook \
+            --port 8888  \
+            --ip='*' \
+            --NotebookApp.token='' \
+            --NotebookApp.password='' \
+            --no-browser </dev/null >/dev/null 2>&1 &
           ## FIXME: creds don't exist yet
           # INSTANCE_ID=`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`
           # aws ec2 create-tags --resources $INSTANCE_ID --tags Key=App,Value="jupyter-notebook" --region us-east-1
       Tags:
-        - Key: Project
+        - Key: ProjectName
           Value: gooserocket
+
+Outputs:
+  JupyterNotebookPublicIp:
+    Value:
+      Fn::GetAtt: JupyterNotebook.PublicIp
+    Export:
+      Name: JupyterNotebookPublicIp

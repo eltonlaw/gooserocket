@@ -1,4 +1,17 @@
 Parameters:
+  BaseImageId:
+    Type: String
+    # ubuntu 22.04
+    Default: ami-007855ac798b5175e
+  DevSecurityGroup:
+    Type: String
+    Default: sg-0ce19ae8f275b3a2b
+  DevKeyName:
+    Type: String
+    Default: gr-dev-instances-1
+  PublicSubnetId1:
+    Type: String
+    Default: subnet-991015fe
   RawDataBucketName:
     Type: String
     Description: Bucket for raw public data
@@ -10,3 +23,25 @@ Resources:
     Properties:
       BucketName: !Ref RawDataBucketName
       AccessControl: Private
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+
+Outputs:
+  BaseImageId:
+    Description: Base image id to be used by all EC2 instances
+    Value: !Ref BaseImageId
+    Export:
+      Name: BaseImageId
+  DevSecurityGroup:
+    Value: !Ref DevSecurityGroup
+    Export:
+      Name: DevSecurityGroup
+  DevKeyName:
+    Value: !Ref DevKeyName
+    Export:
+      Name: DevKeyName
+  PublicSubnetId1:
+    Value: !Ref PublicSubnetId1
+    Export:
+      Name: PublicSubnetId1
