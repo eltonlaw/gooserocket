@@ -3,6 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 use aws_config;
 use aws_sdk_cloudformation as cf;
+use aws_sdk_cloudformation::types::Capability;
 
 pub async fn new_client() -> cf::Client {
     let config = aws_config::from_env().load().await;
@@ -35,6 +36,7 @@ pub async fn create_stack(stack_name: &str, stack_fp: &PathBuf)
         .create_stack()
         .stack_name(stack_name)
         .template_body(template_body)
+        .capabilities(Capability::CapabilityIam)
         .send()
         .await?;
     println!("create_stack res: {:?}", res);
@@ -49,6 +51,7 @@ pub async fn update_stack(stack_name: &str, stack_fp: &PathBuf)
         .update_stack()
         .stack_name(stack_name)
         .template_body(template_body)
+        .capabilities(Capability::CapabilityIam)
         .send()
         .await?;
     println!("update_stack res: {:?}", res);
@@ -68,7 +71,8 @@ pub async fn delete_stack(stack_name: &str)
 }
 
 /// Create the stack if it doesn't exist, otherwise recreate it.
-pub async fn create_or_update_stack(stack_name: &str, stack_fp: &PathBuf)
+pub async fn create_or_update_stack(stack_name: &str,
+                                    stack_fp: &PathBuf)
     -> Result<(), Box<dyn error::Error>> {
 
     if !is_stack_existing(stack_name).await {

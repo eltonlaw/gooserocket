@@ -12,20 +12,63 @@ Parameters:
   PublicSubnetId1:
     Type: String
     Default: subnet-991015fe
-  RawDataBucketName:
+  DatalakeBucketName:
     Type: String
-    Description: Bucket for raw public data
-    Default: gr-raw-data
+    Description: Bucket for raw public data and intermediate results
+    Default: gr-datalake
+  InfraResourcesBucketName:
+    Type: String
+    Description: Bucket for raw public data and intermediate results
+    Default: gr-infra-resources
 
 Resources:
-  RawDataBucket:
+  DatalakeBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref RawDataBucketName
+      BucketName: !Ref DatalakeBucketName
       AccessControl: Private
       Tags:
         - Key: ProjectName
           Value: gooserocket
+  InfraResourcesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref InfraResourcesBucketName
+      AccessControl: Private
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+  DeveloperIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GrDeveloperIamPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - Fn::GetAtt: DatalakeBucket.Arn
+                  - Fn::GetAtt: InfraResourcesBucket.Arn
+      Path: /
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+  DeveloperEC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref DeveloperIamRole
 
 Outputs:
   BaseImageId:
@@ -45,3 +88,7 @@ Outputs:
     Value: !Ref PublicSubnetId1
     Export:
       Name: PublicSubnetId1
+  DeveloperEC2InstanceProfileId:
+    Value: !Ref DeveloperEC2InstanceProfile
+    Export:
+      Name: DeveloperEC2InstanceProfileId

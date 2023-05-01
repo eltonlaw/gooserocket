@@ -8,6 +8,8 @@ Resources:
   JupyterNotebook:
     Type: AWS::EC2::Instance
     Properties:
+      IamInstanceProfile:
+        Fn::ImportValue: DeveloperEC2InstanceProfileId
       InstanceType: !Ref JupyterNotebookInstanceType
       ImageId:
         Fn::ImportValue: BaseImageId
