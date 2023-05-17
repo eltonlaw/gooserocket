@@ -1,18 +1,21 @@
 Parameters:
-  JupyterNotebookInstanceType:
+  JupyterImageId:
+    Type: String
+    Description: Output from manual invoke of JupyterImageRecipe
+    Default: ami-081d9c2b66be19a15
+  JupyterInstanceType:
     Type: String
     Description: Instance type to deploy jupyter notebook with
     Default: t2.micro
 
 Resources:
-  JupyterNotebook:
+  JupyterEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       IamInstanceProfile:
         Fn::ImportValue: DeveloperEC2InstanceProfileId
-      InstanceType: !Ref JupyterNotebookInstanceType
-      ImageId:
-        Fn::ImportValue: BaseImageId
+      InstanceType: !Ref JupyterInstanceType
+      ImageId: !Ref JupyterImageId
       KeyName:
         Fn::ImportValue: DevKeyName
       NetworkInterfaces:
@@ -43,10 +46,9 @@ Resources:
       Tags:
         - Key: ProjectName
           Value: gooserocket
-
 Outputs:
-  JupyterNotebookPublicIp:
+  JupyterEC2InstancePublicIp:
     Value:
-      Fn::GetAtt: JupyterNotebook.PublicIp
+      Fn::GetAtt: JupyterEC2Instance.PublicIp
     Export:
-      Name: JupyterNotebookPublicIp
+      Name: JupyterEC2InstancePublicIp

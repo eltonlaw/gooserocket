@@ -22,6 +22,7 @@ fn main() {
     match matches.subcommand() {
         Some(("deploy", submatches)) => match submatches.get_one::<String>("target").unwrap().as_str() {
             "jupyter-notebook" => gr_engine::deploy_jupyter_notebook(),
+            "jupyter-image-pipeline" => gr_engine::deploy_jupyter_image_pipeline(),
             "common-infra" => gr_engine::deploy_common_infra(),
             _ => unreachable!("Exhausted list of deploy subcommands"),
         },

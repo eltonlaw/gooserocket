@@ -69,6 +69,29 @@ Resources:
       Path: "/"
       Roles:
         - !Ref DeveloperIamRole
+  Ec2ImageBuilderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AWSImageBuilderReadOnlyAccess
+      Path: /
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+  EC2ImageBuilderInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref Ec2ImageBuilderRole
 
 Outputs:
   BaseImageId:
@@ -92,3 +115,7 @@ Outputs:
     Value: !Ref DeveloperEC2InstanceProfile
     Export:
       Name: DeveloperEC2InstanceProfileId
+  EC2ImageBuilderInstanceProfileId:
+    Value: !Ref EC2ImageBuilderInstanceProfile
+    Export:
+      Name: EC2ImageBuilderInstanceProfileId

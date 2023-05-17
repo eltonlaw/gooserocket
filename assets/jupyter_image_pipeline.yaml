@@ -1,0 +1,57 @@
+Parameters:
+  InfraConfigInstanceType:
+    Type: String
+    Description: Instance type to build AMI with
+    Default: t2.micro
+
+Resources:
+  JupyterImageRecipe:
+    Type: AWS::ImageBuilder::ImageRecipe
+    Properties:
+      Components:
+        - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/update-linux/x.x.x
+        - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/aws-cli-version-2-linux/x.x.x
+      Name: JupyterImageRecipe
+      ParentImage: arn:aws:imagebuilder:us-east-1:aws:image/ubuntu-server-20-lts-x86/x.x.x
+      Tags:
+        ProjectName: gooserocket
+      Version: 1.0.0
+
+  JupyterInfrastructureConfiguration:
+    Type: AWS::ImageBuilder::InfrastructureConfiguration
+    Properties:
+      Name: 'JupyterInfrastructureConfiguration'
+      InstanceProfileName:
+        Fn::ImportValue: EC2ImageBuilderInstanceProfileId
+      InstanceTypes:
+        - !Ref InfraConfigInstanceType
+      KeyPair:
+        Fn::ImportValue: DevKeyName
+      TerminateInstanceOnFailure: true
+      SecurityGroupIds:
+        - Fn::ImportValue: DevSecurityGroup
+      SubnetId:
+        Fn::ImportValue: PublicSubnetId1
+      Tags:
+        ProjectName: gooserocket
+
+  JupyterDistributionConfiguration:
+    Type: AWS::ImageBuilder::DistributionConfiguration
+    Properties:
+      Distributions:
+        - AmiDistributionConfiguration:
+            Description: Jupyter notebook AMI
+          Region: !Ref AWS::Region
+      Name: gr-jupyter-distibution-configuration
+      Tags:
+        ProjectName: gooserocket
+
+  JupyterImagePipeline:
+    Type: AWS::ImageBuilder::ImagePipeline
+    Properties:
+      ImageRecipeArn: !Ref JupyterImageRecipe
+      InfrastructureConfigurationArn: !Ref JupyterInfrastructureConfiguration
+      DistributionConfigurationArn: !Ref JupyterDistributionConfiguration
+      Name: JupyterImagePipeline
+      Tags:
+        ProjectName: gooserocket
