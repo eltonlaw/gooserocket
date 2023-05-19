@@ -1,8 +1,4 @@
 Parameters:
-  BaseImageId:
-    Type: String
-    # ubuntu 22.04
-    Default: ami-007855ac798b5175e
   DevSecurityGroup:
     Type: String
     Default: sg-0ce19ae8f275b3a2b
@@ -93,12 +89,29 @@ Resources:
       Roles:
         - !Ref Ec2ImageBuilderRole
 
+  GitCloneGooserocketIBComponent:
+    Type: AWS::ImageBuilder::Component
+    Properties:
+      Name: git-clone-gooserocket
+      Platform: Linux
+      Version: 1.0.0
+      SupportedOsVersions:
+        - Ubuntu
+      Data: |
+        name: Git clone gooserocket
+        schemaVersion: 1.0
+        phases:
+          - name: build
+            steps:
+              - name: GitCloneGooserocket
+                action: ExecuteBash
+                inputs:
+                  commands:
+                    - |
+                      git clone https://github.com/eltonlaw/gooserocket.git /home/ubuntu/gooserocket
+                      chown -R ubuntu:ubuntu /home/ubuntu/gooserocket
+
 Outputs:
-  BaseImageId:
-    Description: Base image id to be used by all EC2 instances
-    Value: !Ref BaseImageId
-    Export:
-      Name: BaseImageId
   DevSecurityGroup:
     Value: !Ref DevSecurityGroup
     Export:
@@ -119,3 +132,7 @@ Outputs:
     Value: !Ref EC2ImageBuilderInstanceProfile
     Export:
       Name: EC2ImageBuilderInstanceProfileId
+  GitCloneGooserocketIBComponentArn:
+    Value: !Ref GitCloneGooserocketIBComponent
+    Export:
+      Name: GitCloneGooserocketIBComponentArn

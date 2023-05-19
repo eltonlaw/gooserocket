@@ -1,8 +1,4 @@
 Parameters:
-  JupyterImageId:
-    Type: String
-    Description: Output from manual invoke of JupyterImageRecipe
-    Default: ami-081d9c2b66be19a15
   JupyterInstanceType:
     Type: String
     Description: Instance type to deploy jupyter notebook with
@@ -15,7 +11,7 @@ Resources:
       IamInstanceProfile:
         Fn::ImportValue: DeveloperEC2InstanceProfileId
       InstanceType: !Ref JupyterInstanceType
-      ImageId: !Ref JupyterImageId
+      ImageId: !ImportValue JupyterImageId
       KeyName:
         Fn::ImportValue: DevKeyName
       NetworkInterfaces:

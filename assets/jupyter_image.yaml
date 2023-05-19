@@ -5,12 +5,43 @@ Parameters:
     Default: t2.micro
 
 Resources:
+  JupyterServerComponent:
+    Type: AWS::ImageBuilder::Component
+    Properties:
+      Name: jupyter-server
+      Platform: Linux
+      Version: 1.0.0
+      SupportedOsVersions:
+        - Ubuntu
+      Data: |
+        name: Installs dependencies to run a jupyter server and runs one as a daemon
+        schemaVersion: 1.0
+        phases:
+          - name: build
+            steps:
+              - name: InstallJupyterDeps
+                action: ExecuteBash
+                inputs:
+                  commands:
+                    - |
+                      apt install awscli python3-pip -y
+                      # To avoid, "ImportError: cannot import name 'soft_unicode' from 'markupsafe'"
+                      pip3 install markupsafe==2.0.1
+                      pip3 install jupyter
+                      pip3 install --upgrade nbconvert
+                      cp /home/ubuntu/gooserocket/assets/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service
+                      systemctl enable jupyter-notebook.service
+
+
   JupyterImageRecipe:
     Type: AWS::ImageBuilder::ImageRecipe
     Properties:
       Components:
         - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/update-linux/x.x.x
         - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/aws-cli-version-2-linux/x.x.x
+        - ComponentArn:
+            Fn::ImportValue: GitCloneGooserocketIBComponentArn
+        - ComponentArn: !Ref JupyterServerComponent
       Name: JupyterImageRecipe
       ParentImage: arn:aws:imagebuilder:us-east-1:aws:image/ubuntu-server-20-lts-x86/x.x.x
       Tags:
@@ -46,8 +77,8 @@ Resources:
       Tags:
         ProjectName: gooserocket
 
-  JupyterImagePipeline:
-    Type: AWS::ImageBuilder::ImagePipeline
+  JupyterImage:
+    Type: AWS::ImageBuilder::Image
     Properties:
       ImageRecipeArn: !Ref JupyterImageRecipe
       InfrastructureConfigurationArn: !Ref JupyterInfrastructureConfiguration
@@ -55,3 +86,10 @@ Resources:
       Name: JupyterImagePipeline
       Tags:
         ProjectName: gooserocket
+
+Outputs:
+  JupyterImageId:
+    Value:
+      Fn::GetAtt: JupyterImage.ImageId
+    Export:
+      Name: JupyterImageId

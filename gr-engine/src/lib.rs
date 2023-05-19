@@ -12,13 +12,12 @@ fn deploy_cf_yaml(stack_name: &str, pb: PathBuf) {
     }
 }
 
-/// Deploys cf stack that creates an AWS::ImageBuilder::ImagePipeline instance
-/// which should get manually invoked occasionally to create new images which
-/// will be used by notebook instances.
-pub fn deploy_jupyter_image_pipeline() {
+/// Deploys cf stack that creates an AWS::ImageBuilder::Image instance
+/// can be referenced when creating notebook instances.
+pub fn deploy_jupyter_image() {
     let pb = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../assets/jupyter_image_pipeline.yaml");
-    deploy_cf_yaml("gr-image-pipeline", pb);
+        .join("../assets/jupyter_image.yaml");
+    deploy_cf_yaml("gr-jupyter-image", pb);
 }
 
 /// Deploys an ec2 instance which start jupyter without auth on 8888
