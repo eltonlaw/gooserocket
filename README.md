@@ -61,3 +61,23 @@ gooserocket is a computational bioinformatics research platform for running expe
 Currently just cloudformation stacks deployed via aws api calls by rust sdk using [these hardcoded CF templates](https://github.com/eltonlaw/gooserocket/tree/main/assets)
 
 NOTE: Not all required AWS resources are in CF such that you can deploy the entire platform cold:  security group, ssh key-pair, create billing reports sent to bucket
+
+## Usage
+
+### Setting up the experimentation environment
+
+To deploy the base infra (S3 buckets, IAM roles etc.)
+
+    ./gr-cli deploy common-infra
+
+To build the jupyter image
+
+    ./gr-cli deploy jupyter-image
+
+To create a jupyter notebook instance out of the image above
+
+    ./gr-cli deploy jupyter-notebook
+
+To stop the deployed jupyter notebook instance
+
+    ./gr-cli shutdown
