@@ -53,8 +53,10 @@ Resources:
                 Action:
                   - s3:*
                 Resource:
-                  - Fn::GetAtt: DatalakeBucket.Arn
-                  - Fn::GetAtt: InfraResourcesBucket.Arn
+                  - !GetAtt DatalakeBucket.Arn
+                  - Fn::Join: ["", [!GetAtt DatalakeBucket.Arn, "/*"]]
+                  - !GetAtt InfraResourcesBucket.Arn
+                  - Fn::Join: ["", [!GetAtt InfraResourcesBucket.Arn, "/*"]]
       Path: /
       Tags:
         - Key: ProjectName
