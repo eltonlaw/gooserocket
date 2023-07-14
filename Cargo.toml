@@ -5,4 +5,5 @@ members = [
     "gr-cli",
     "gr-engine",
     "gr-infra",
+    "gr-local-dev",
 ]
