@@ -1,0 +1,107 @@
+Parameters:
+  InfraConfigInstanceType:
+    Type: String
+    Description: Instance type to build AMI with
+    Default: t2.micro
+
+Resources:
+  CertAuthorityComponent:
+    Type: AWS::ImageBuilder::Component
+    Properties:
+      Name: cert-authority
+      Platform: Linux
+      Version: 1.0.0
+      SupportedOsVersions:
+        - Ubuntu
+      Data: |
+        name: Create CertAuthority and generate certs & keys
+        schemaVersion: 1.0
+        phases:
+          - name: build
+            steps:
+              - name: build-ca
+                action: ExecuteBash
+                inputs:
+                  commands:
+                    - |
+                      apt install easy-rsa -y
+                      make-cadir /home/ubuntu/gooserocket-ca
+                      echo 'set_var EASYRSA_BATCH "yes"' >> /home/ubuntu/gooserocket-ca/vars
+                      cd /home/ubuntu/gooserocket-ca && ./easyrsa init-pki
+                      cd /home/ubuntu/gooserocket-ca && ./easyrsa build-ca nopass
+                      chown -R ubuntu:ubuntu /home/ubuntu/gooserocket-ca
+
+  CertAuthorityImageRecipe:
+    Type: AWS::ImageBuilder::ImageRecipe
+    Properties:
+      Components:
+        - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/update-linux/x.x.x
+        - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/aws-cli-version-2-linux/x.x.x
+        - ComponentArn: !Ref CertAuthorityComponent
+      Name: CertAuthorityImageRecipe
+      ParentImage: arn:aws:imagebuilder:us-east-1:aws:image/ubuntu-server-20-lts-x86/x.x.x
+      Tags:
+        ProjectName: gooserocket
+      Version: 1.0.0
+
+  CertAuthorityInfrastructureConfiguration:
+    Type: AWS::ImageBuilder::InfrastructureConfiguration
+    Properties:
+      Name: 'CertAuthorityInfrastructureConfiguration'
+      InstanceProfileName:
+        Fn::ImportValue: EC2ImageBuilderInstanceProfileId
+      InstanceTypes:
+        - !Ref InfraConfigInstanceType
+      KeyPair:
+        Fn::ImportValue: DevKeyName
+      TerminateInstanceOnFailure: true
+      SecurityGroupIds:
+        - Fn::ImportValue: DevSecurityGroup
+      SubnetId:
+        Fn::ImportValue: PublicSubnetId1
+      Tags:
+        ProjectName: gooserocket
+
+  CertAuthorityDistributionConfiguration:
+    Type: AWS::ImageBuilder::DistributionConfiguration
+    Properties:
+      Distributions:
+        - AmiDistributionConfiguration:
+            Description: CertAuthority AMI
+          Region: !Ref AWS::Region
+      Name: gr-cert-authority-distibution-configuration
+      Tags:
+        ProjectName: gooserocket
+
+  CertAuthorityImage:
+    Type: AWS::ImageBuilder::Image
+    Properties:
+      ImageRecipeArn: !Ref CertAuthorityImageRecipe
+      InfrastructureConfigurationArn: !Ref CertAuthorityInfrastructureConfiguration
+      DistributionConfigurationArn: !Ref CertAuthorityDistributionConfiguration
+      Name: CertAuthorityImagePipeline
+      Tags:
+        ProjectName: gooserocket
+
+  CertAuthorityEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile:
+        Fn::ImportValue: DeveloperEC2InstanceProfileId
+      InstanceType: t2.nano
+      ImageId:
+        Fn::GetAtt: CertAuthorityImage.ImageId 
+      KeyName:
+        Fn::ImportValue: DevKeyName
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          SubnetId:
+            Fn::ImportValue: PublicSubnetId1
+          GroupSet:
+            - Fn::ImportValue: DevSecurityGroup
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+        - Key: Name
+          Value: cert-authority

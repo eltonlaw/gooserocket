@@ -1,0 +1,108 @@
+Parameters:
+  InfraConfigInstanceType:
+    Type: String
+    Description: Instance type to build AMI with
+    Default: t2.micro
+  OpenvpnSecurityGroup:
+    Type: String
+    Description: Instance type to build AMI with
+    Default: sg-0c0761fdabc036a0d
+
+Resources:
+  OpenvpnComponent:
+    Type: AWS::ImageBuilder::Component
+    Properties:
+      Name: openvpn
+      Platform: Linux
+      Version: 1.0.0
+      SupportedOsVersions:
+        - Ubuntu
+      Data: |
+        name: Installs dependencies to run an openvpn server
+        schemaVersion: 1.0
+        phases:
+          - name: build
+            steps:
+              - name: InstallOpenvpnDeps
+                action: ExecuteBash
+                inputs:
+                  commands:
+                    - |
+                      apt install easy-rsa openvpn -y
+
+  OpenvpnImageRecipe:
+    Type: AWS::ImageBuilder::ImageRecipe
+    Properties:
+      Components:
+        - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/update-linux/x.x.x
+        - ComponentArn: arn:aws:imagebuilder:us-east-1:aws:component/aws-cli-version-2-linux/x.x.x
+        - ComponentArn:
+            Fn::ImportValue: GitCloneGooserocketIBComponentArn
+        - ComponentArn: !Ref OpenvpnComponent
+      Name: OpenvpnImageRecipe
+      ParentImage: arn:aws:imagebuilder:us-east-1:aws:image/ubuntu-server-20-lts-x86/x.x.x
+      Tags:
+        ProjectName: gooserocket
+      Version: 1.0.0
+
+  OpenvpnInfrastructureConfiguration:
+    Type: AWS::ImageBuilder::InfrastructureConfiguration
+    Properties:
+      Name: 'OpenvpnInfrastructureConfiguration'
+      InstanceProfileName:
+        Fn::ImportValue: EC2ImageBuilderInstanceProfileId
+      InstanceTypes:
+        - !Ref InfraConfigInstanceType
+      KeyPair:
+        Fn::ImportValue: DevKeyName
+      TerminateInstanceOnFailure: true
+      SecurityGroupIds:
+        - !Ref OpenvpnSecurityGroup
+      SubnetId:
+        Fn::ImportValue: PublicSubnetId1
+      Tags:
+        ProjectName: gooserocket
+
+  OpenvpnDistributionConfiguration:
+    Type: AWS::ImageBuilder::DistributionConfiguration
+    Properties:
+      Distributions:
+        - AmiDistributionConfiguration:
+            Description: Openvpn AMI
+          Region: !Ref AWS::Region
+      Name: gr-openvpn-distibution-configuration
+      Tags:
+        ProjectName: gooserocket
+
+  OpenvpnImage:
+    Type: AWS::ImageBuilder::Image
+    Properties:
+      ImageRecipeArn: !Ref OpenvpnImageRecipe
+      InfrastructureConfigurationArn: !Ref OpenvpnInfrastructureConfiguration
+      DistributionConfigurationArn: !Ref OpenvpnDistributionConfiguration
+      Name: OpenvpnImagePipeline
+      Tags:
+        ProjectName: gooserocket
+
+  OpenvpnEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile:
+        Fn::ImportValue: DeveloperEC2InstanceProfileId
+      InstanceType: t2.nano
+      ImageId:
+        Fn::GetAtt: OpenvpnImage.ImageId
+      KeyName:
+        Fn::ImportValue: DevKeyName
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          SubnetId:
+            Fn::ImportValue: PublicSubnetId1
+          GroupSet:
+            - !Ref sg-0c0761fdabc036a0d
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+        - Key: Name
+          Value: openvpn

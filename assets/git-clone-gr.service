@@ -1,0 +1,13 @@
+[Unit]
+Description=Clone eltonlaw/gooserocket `main` branch into home dir
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/git pull
+WorkingDirectory=/home/ubuntu/gooserocket
+User=ubuntu
+Group=ubuntu
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
