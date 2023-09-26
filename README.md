@@ -13,7 +13,7 @@ gooserocket is a computational bioinformatics research platform for running expe
 1. Keeping costs low: AWS spot instances will be used, so things will be built such that they are interruption tolerant.
     1. No idle resources. Only select things in S3 will be persisted.
     2. All jobs run through spot instances, compute set up to be idempotent and interruptible.
-    3. Minimize egress from S3/ECR, keep everything in same region, HA is unneccessary. At \$0.09/GB, grabbing terabyte level data from S3 gets super expensive 
+    3. Minimize egress from S3/ECR, keep everything in same region, HA is unneccessary. At \$0.09/GB, grabbing terabyte level data from S3 gets super expensive
 2. Most of the scientific work will be done in a jupyter notebook. Heavy processing will handled by an orchestrator which takes in requests, spins up the necessary infra and responds immediately with a response id. From the jupyter nb, you'll ask about the response id until its succeeded/failed at which point there'll be a file in s3.
 
 ## Aspirations
@@ -81,3 +81,30 @@ To create a jupyter notebook instance out of the image above
 To stop the deployed jupyter notebook instance
 
     ./gr-cli shutdown
+
+## Nix Environment Setup
+
+### Troubleshooting
+
+#### error: experimental Nix feature 'nix-command' is disabled; use '--extra-experimental-features nix-command' to override
+
+Add to `~/.config/nix/nix.conf` 
+```
+experimental-features = nix-command
+```
+#### error: getting status of /nix/var/nix/daemon-socket/socket: Permission denied
+
+If just installed, restart
+
+Check if the daemon is running and start it if not
+```
+sudo systemctl status nix-daemon.service
+sudo systemctl enable nix-daemon.service
+sudo systemctl start nix-daemon.service
+```
+
+Add user to `nix-users`
+
+```
+sudo usermod -aG nix-users $(whoami)
+```

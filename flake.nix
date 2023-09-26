@@ -11,13 +11,12 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
-          inherit system overlays;
-          config = { allowUnfree = true; }; };
+          inherit system overlays; };
+        python = pkgs.python3;
         overlays = [ (import rust-overlay) ];
         rustVersion = pkgs.rust-bin.stable.latest.default;
       in {
         devShell = pkgs.mkShell {
           buildInputs = [
-            (rustVersion.override { extensions = [ "rust-src" ]; } ) 
-            pkgs.hello pkgs.cowsay ]; }; }); 
-}
+            (python.withPackages (ps: with ps; [ ipython matplotlib pandas numpy ] ))
+            (rustVersion.override { extensions = [ "rust-src" ]; } ) ]; }; }); }
