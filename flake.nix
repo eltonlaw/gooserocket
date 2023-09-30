@@ -21,4 +21,25 @@
           buildInputs = [
             (python.withPackages gr-python.packages)
             (rustVersion.override { extensions = [ "rust-src" ]; } )
+            # missing: bioawk csvtk bedgraphtobigwig
+            pkgs.bcftools
+            pkgs.bedtools
+            pkgs.bwa
+            pkgs.bowtie2
+            pkgs.datamash
+            pkgs.emboss
+            # pkgs.fastqr
+            pkgs.fastp
+            pkgs.freebayes
+            pkgs.hisat2
+            pkgs.mafft
+            pkgs.nix-prefetch
+            pkgs.parallel
+            pkgs.samtools
+            pkgs.seqkit
+            pkgs.snpeff
+            pkgs.subread
+            pkgs.sratoolkit
+            pkgs.trimmomatic
+            pkgs.wget
             ]; }; }); }
