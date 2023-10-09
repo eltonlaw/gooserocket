@@ -1,0 +1,47 @@
+Parameters:
+  DevInstanceType:
+    Type: String
+    Description: Instance type to deploy jupyter notebook with
+    Default: m7g.large
+  DevImageId:
+    Type: String
+    Default: ami-0a0c8eebcdd6dcbd0
+  TagInstanceName:
+    Type: String
+
+Resources:
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile:
+        Fn::ImportValue: DeveloperEC2InstanceProfileId
+      InstanceType: !Ref DevInstanceType
+      ImageId: !Ref DevImageId
+      KeyName:
+        Fn::ImportValue: DevKeyName
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          AssociatePublicIpAddress: true
+          SubnetId:
+            Fn::ImportValue: PublicSubnetId1
+          GroupSet:
+            - Fn::ImportValue: DevSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt update -y
+      Tags:
+        - Key: ProjectName
+          Value: gooserocket
+        - Key: Name
+          Value: !Ref TagInstanceName
+Outputs:
+  DevEC2InstancePublicIp:
+    Value:
+      Fn::GetAtt: DevEC2Instance.PublicIp
+    Export:
+      Name: DevEC2InstancePublicIp
+  DevEC2InstanceId:
+    Value: !Ref DevEC2Instance
+    Export:
+      Name: DevEC2InstanceId

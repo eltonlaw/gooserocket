@@ -29,11 +29,10 @@ Resources:
                       pip3 install markupsafe==2.0.1
                       pip3 install jupyter
                       pip3 install --upgrade nbconvert
-                      cp /home/ubuntu/gooserocket/assets/jupyter-notebook.service /etc/systemd/system/jupyter-notebook.service
-                      systemctl enable jupyter-notebook.service
+                      cp /home/ubuntu/gooserocket/gr-infra/resources/gr-jupyter-notebook.service /etc/systemd/system/gr-jupyter-notebook.service
 
 
-  JupyterImageRecipe:
+  DevImageRecipe:
     Type: AWS::ImageBuilder::ImageRecipe
     Properties:
       Components:
@@ -42,16 +41,16 @@ Resources:
         - ComponentArn:
             Fn::ImportValue: GitCloneGooserocketIBComponentArn
         - ComponentArn: !Ref JupyterServerComponent
-      Name: JupyterImageRecipe
+      Name: DevImageRecipe
       ParentImage: arn:aws:imagebuilder:us-east-1:aws:image/ubuntu-server-20-lts-x86/x.x.x
       Tags:
         ProjectName: gooserocket
       Version: 1.0.0
 
-  JupyterInfrastructureConfiguration:
+  DevInfrastructureConfiguration:
     Type: AWS::ImageBuilder::InfrastructureConfiguration
     Properties:
-      Name: 'JupyterInfrastructureConfiguration'
+      Name: 'DevInfrastructureConfiguration'
       InstanceProfileName:
         Fn::ImportValue: EC2ImageBuilderInstanceProfileId
       InstanceTypes:
@@ -66,30 +65,30 @@ Resources:
       Tags:
         ProjectName: gooserocket
 
-  JupyterDistributionConfiguration:
+  DevDistributionConfiguration:
     Type: AWS::ImageBuilder::DistributionConfiguration
     Properties:
       Distributions:
         - AmiDistributionConfiguration:
-            Description: Jupyter notebook AMI
+            Description: Dev instance AMI
           Region: !Ref AWS::Region
-      Name: gr-jupyter-distibution-configuration
+      Name: gr-dev-distribution-configuration
       Tags:
         ProjectName: gooserocket
 
-  JupyterImage:
+  DevImage:
     Type: AWS::ImageBuilder::Image
     Properties:
-      ImageRecipeArn: !Ref JupyterImageRecipe
-      InfrastructureConfigurationArn: !Ref JupyterInfrastructureConfiguration
-      DistributionConfigurationArn: !Ref JupyterDistributionConfiguration
-      Name: JupyterImagePipeline
+      ImageRecipeArn: !Ref DevImageRecipe
+      InfrastructureConfigurationArn: !Ref DevInfrastructureConfiguration
+      DistributionConfigurationArn: !Ref DevDistributionConfiguration
+      Name: DevImagePipeline
       Tags:
         ProjectName: gooserocket
 
 Outputs:
-  JupyterImageId:
+  DevImageId:
     Value:
-      Fn::GetAtt: JupyterImage.ImageId
+      Fn::GetAtt: DevImage.ImageId
     Export:
-      Name: JupyterImageId
+      Name: DevImageId

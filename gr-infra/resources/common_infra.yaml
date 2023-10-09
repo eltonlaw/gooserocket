@@ -112,6 +112,8 @@ Resources:
                     - |
                       git clone https://github.com/eltonlaw/gooserocket.git /home/ubuntu/gooserocket
                       chown -R ubuntu:ubuntu /home/ubuntu/gooserocket
+                      cp /home/ubuntu/gooserocket/gr-infra/resources/gr-git-clone.service /etc/systemd/system/gr-git-clone.service
+                      systemctl enable gr-git-clone.service
 
 Outputs:
   DevSecurityGroup:

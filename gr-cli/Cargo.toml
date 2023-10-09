@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.2.4", features = ["cargo"] }
-gr-engine = { path = "../gr-engine" }
+gr-infra = { path = "../gr-infra" }
 gr-local-dev = { path = "../gr-local-dev" }
+tokio = { version = "1", features = ["full"] }

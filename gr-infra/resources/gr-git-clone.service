@@ -1,5 +1,5 @@
 [Unit]
-Description=Clone eltonlaw/gooserocket `main` branch into home dir
+Description=Pull latest eltonlaw/gooserocket `main` branch
 After=network.target
 
 [Service]

@@ -18,4 +18,3 @@ pub fn start_jupyter_notebook() {
         println!("Command error:\n{}", stderr);
     }
 }
-
