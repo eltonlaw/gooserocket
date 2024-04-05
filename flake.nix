@@ -28,6 +28,7 @@
             pkgs.bowtie2
             pkgs.datamash
             pkgs.emboss
+            pkgs.emboss
             # pkgs.fastqr
             pkgs.fastp
             pkgs.freebayes
