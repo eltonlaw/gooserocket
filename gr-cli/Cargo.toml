@@ -9,4 +9,5 @@ edition = "2021"
 clap = { version = "4.2.4", features = ["cargo"] }
 gr-infra = { path = "../gr-infra" }
 gr-local-dev = { path = "../gr-local-dev" }
+gr-bio = { path = "../gr-bio" }
 tokio = { version = "1", features = ["full"] }

@@ -9,6 +9,14 @@ fn main() {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
+            Command::new("analyze").about("Run analysis on file").arg(
+                Arg::new("file")
+                    .help("input file")
+                    .action(ArgAction::Set)
+                    .required(true),
+            ),
+        )
+        .subcommand(
             Command::new("deploy").about("Deploy a new service").arg(
                 Arg::new("target")
                     .help("deploy target")
@@ -37,6 +45,9 @@ fn main() {
         .get_matches();
     let rt = Runtime::new().unwrap();
     match matches.subcommand() {
+        Some(("analyze", submatches)) => {
+            gr_bio::analyze(submatches.get_one::<String>("file").unwrap());
+        }
         Some(("deploy", submatches)) => {
             match submatches.get_one::<String>("target").unwrap().as_str() {
                 "dev-image" => rt.block_on(gr_infra::deploy_dev_image()),
