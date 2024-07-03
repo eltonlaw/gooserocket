@@ -11,6 +11,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
+          config.allowUnfree = true;
           inherit system overlays; };
         python = pkgs.python3;
         overlays = [ (import rust-overlay) ];
